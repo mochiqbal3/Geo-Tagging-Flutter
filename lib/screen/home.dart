@@ -37,109 +37,119 @@ class _HomeScreenState extends State<HomeScreen> {
       locationSignOut = val ?? "";
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
+        actions: <Widget>[
+          // action button
+          IconButton(
+            icon: Icon(Icons.map),
+            onPressed: () {
+              Navigator.pushNamed(context, "/map");
+            },
+          ),
+        ],
       ),
-        body: Container(
-          padding: EdgeInsets.all(8),
-            color: Theme.of(context).primaryColor,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: <Widget>[
-                Row(
+      body: Container(
+        padding: EdgeInsets.all(8),
+          color: Theme.of(context).primaryColor,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(child: Text("Halo, $username"),)
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                child: Text(
+                  "Lokasi Saat Ini",
+                  textAlign : TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16
+                    ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(const Radius.circular(8)),
+                  color: Theme.of(context).accentColor
+                ),
+                padding: EdgeInsets.all(8),
+                child: Column(
                   children: <Widget>[
-                    Expanded(child: Text("Halo, $username"),)
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Latitude"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$latitude'),)
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Longitude"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$longitude'),)
+                      ],
+                    )
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
-                  child: Text(
-                    "Lokasi Saat Ini",
-                    textAlign : TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16
-                      ),
-                  ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(const Radius.circular(8)),
+                  color: Theme.of(context).accentColor
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(const Radius.circular(8)),
-                    color: Theme.of(context).accentColor
-                  ),
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Latitude"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$latitude'),)
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Longitude"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$longitude'),)
-                        ],
-                      )
-                    ],
-                  ),
+                padding: EdgeInsets.all(8),
+                margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Jam Masuk"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$clockSignIn'))
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Lokasi Masuk"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$locationSignIn'),)
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Jam Keluar"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$clockSignOut'),)
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Lokasi Keluar"),),
+                        Expanded(child: Text(":"),),
+                        Expanded(child: Text('$locationSignOut'),)
+                      ],
+                    )
+                  ],
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(const Radius.circular(8)),
-                    color: Theme.of(context).accentColor
-                  ),
-                  padding: EdgeInsets.all(8),
-                  margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Jam Masuk"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$clockSignIn'))
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Lokasi Masuk"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$locationSignIn'),)
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Jam Keluar"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$clockSignOut'),)
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Text("Lokasi Keluar"),),
-                          Expanded(child: Text(":"),),
-                          Expanded(child: Text('$locationSignOut'),)
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    sign(latitude,longitude);
-                  },
-                  color: isSignColor(),
-                  child: Text(isSignText(), style: TextStyle(color: isSignTextColor()),),
-                )
-              ],
-            )));
+              ),
+              RaisedButton(
+                onPressed: () {
+                  sign(latitude,longitude);
+                },
+                color: isSignColor(),
+                child: Text(isSignText(), style: TextStyle(color: isSignTextColor()),),
+              )
+            ],
+          )
+        )
+      );
   }
 
   isSignColor(){
@@ -200,8 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   grantPermission() async{
     final PermissionHandler _permissionHandler = PermissionHandler();
-    var result = await _permissionHandler.requestPermissions([PermissionGroup.location]);
-    switch (result[PermissionGroup.location]) {
+    var result = await _permissionHandler.requestPermissions([PermissionGroup.locationWhenInUse]);
+    switch (result[PermissionGroup.locationWhenInUse]) {
       case PermissionStatus.granted:
         getCurrentLocation();
         break;

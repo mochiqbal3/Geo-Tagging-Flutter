@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geotagging/screen/splash_screen.dart';
 import 'package:geotagging/screen/home.dart';
 import 'package:geotagging/screen/login.dart';
+import 'package:geotagging/screen/maps.dart';
 
 void main() => runApp(MaterialApp(
       theme: ThemeData(
@@ -11,5 +12,6 @@ void main() => runApp(MaterialApp(
       home: SplashScreen(),
       routes: {
         '/home': (context) => HomeScreen(),
-        '/login': (context) => LoginPage()},
+        '/login': (context) => LoginPage(),
+        '/map':(context) => Map()},
     ));
