@@ -230,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   checkPermmission() async {
     final PermissionHandler _permissionHandler = PermissionHandler();
-    var permissionStatus = await _permissionHandler.checkPermissionStatus(PermissionGroup.location);
+    var permissionStatus = await _permissionHandler.checkPermissionStatus(PermissionGroup.locationWhenInUse);
     switch (permissionStatus) {
       case PermissionStatus.granted:
         getCurrentLocation();
