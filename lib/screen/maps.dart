@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:geotagging/util/connection.dart';
+import 'package:geotagging/model/presence.dart';
 
 class Map extends StatefulWidget {
   @override
@@ -11,6 +13,8 @@ class Map extends StatefulWidget {
 }
 
 class MapState extends State<Map> {
+  List<Presence> presences = [];
+  Presence presence;
   double latitude = 0.0;
   double longitude = 0.0;
   double currentLatitude = 0.0;
@@ -25,10 +29,114 @@ class MapState extends State<Map> {
   void initState(){
     latitude = -6.905563;
     longitude = 107.603798;
-    checkPermmission();
+    getListPresence();
   }
-
-  
+  showDetailModal({bool isSignIn = true}){
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        margin: EdgeInsets.all(16),
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Row(children: <Widget>[
+                Expanded(child: Text("Username",
+                style: TextStyle(
+                  color: Colors.white
+                ),),),
+                Expanded(child: Text(":",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(presence.username,style: TextStyle(
+                  color: Colors.white
+                )),)
+              ],),
+              Row(children: <Widget>[
+                Expanded(child: Text(isSignIn ? "Sign In" : "Sign Out",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(":",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(isSignIn ? presence.signIn : presence.signOut,style: TextStyle(
+                  color: Colors.white
+                )),)
+              ],),
+              Row(children: <Widget>[
+                Expanded(child: Text("Latitude",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(":",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(isSignIn ? presence.latSignIn.toString() : presence.latSignOut.toString(),style: TextStyle(
+                  color: Colors.white
+                )),)
+              ],),
+              Row(children: <Widget>[
+                Expanded(child: Text("Longitude",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(":",style: TextStyle(
+                  color: Colors.white
+                )),),
+                Expanded(child: Text(isSignIn ? presence.longSignIn.toString() : presence.longSignOut.toString(),style: TextStyle(
+                  color: Colors.white
+                )),)
+              ],)
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: Colors.blue[900],
+            borderRadius: BorderRadius.all(
+              Radius.circular(8)
+          ),
+        ),
+        )
+      ));
+  }
+  getListPresence() async{
+    await ApiService()
+      .getWithListResponse({}, "api/v1/Presence","").then((response) {
+      if (response.status) {
+        if (response.data != null) {
+          var _presences = Presence.fromJsonList(response.data);
+          this.setState(() {
+            presences = _presences;
+          });
+          _presences.forEach((value) async{
+            print(value.latSignIn.toString() + " " + value.longSignIn.toString());
+            _markers.add(
+              Marker(
+                markerId: MarkerId(value.username+"signIn"),
+                position: LatLng(value.latSignIn,value.longSignIn),
+                onTap: (){
+                  setState(() {
+                    presence = value;
+                  });
+                  showDetailModal();
+                }
+              )
+            );
+            _markers.add(
+              Marker(
+                markerId: MarkerId(value.username+"signOut"),
+                position: LatLng(value.latSignOut,value.longSignOut),
+                onTap: (){
+                  setState(() {
+                    presence = value;
+                  });
+                  showDetailModal(isSignIn: false);
+                }
+              )
+            );
+          });
+        }
+      } else {
+        print("error ");
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final CameraPosition _office = CameraPosition(
@@ -40,17 +148,8 @@ class MapState extends State<Map> {
       controller.animateCamera(CameraUpdate.newCameraPosition(_office));
     }
 
-    _markers.add(Marker(
-      markerId: MarkerId("currentLocation"),
-      position: LatLng(currentLatitude,currentLongitude),
-      onTap: (){
-        showModalBottomSheet(
-          context: context,
-          builder: (context) => Container(
-                color: Colors.red,
-              ));
-      }
-    ));
+    
+    
 
     Future<void> _toCurrent(CameraPosition cameraPosition) async {
       final GoogleMapController controller = await _controller.future;
@@ -59,9 +158,8 @@ class MapState extends State<Map> {
     this.setState((){
       _currentLocation = CameraPosition(
         target: LatLng(currentLatitude,currentLongitude),
-        zoom: 16,
+        zoom: 14,
       );
-      _toCurrent(_currentLocation);
     });
 
     
@@ -74,9 +172,16 @@ class MapState extends State<Map> {
       radius: 2000,
     )]);
     return new Scaffold(
+      appBar: AppBar(
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ), 
+        title: Text("Maps Picker"),
+      ),
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _currentLocation,
+        initialCameraPosition: _office,
         myLocationButtonEnabled: true,
         myLocationEnabled: true,
         onMapCreated: (GoogleMapController controller) {
@@ -96,8 +201,9 @@ class MapState extends State<Map> {
   getCurrentLocation() async {
     Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState((){
-      currentLatitude = position.latitude;
-      currentLongitude = position.longitude;
+      currentLatitude = position.latitude ?? 0;
+      currentLongitude = position.longitude ?? 0;
+      
     });
   }
 

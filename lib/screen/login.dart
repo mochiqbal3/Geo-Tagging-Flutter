@@ -101,14 +101,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: RaisedButton(
                         onPressed: () {
                           if (!isLoading) {
-                            print("if");
-                            setState(() {
-                              isLoading = true;
-                            });
-                            SharedPrefs.storePref("username", 
-                            _controllerUsername.text.toString());
-                            SharedPrefs.storeBool("isLogin", true);
-                            Navigator.pushReplacementNamed(context, "/home");
+                            if(isValid()){
+                              setState(() {
+                                isLoading = true;
+                              });
+                              SharedPrefs.storePref("username", 
+                              _controllerUsername.text.toString());
+                              SharedPrefs.storeBool("isLogin", true);
+                              Navigator.pushReplacementNamed(context, "/home");
+                            }                            
                           }else{
                             print("else");
                           }
@@ -131,6 +132,15 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     ));
+  }
+  isValid(){
+    if(_controllerUsername.text.toString() == ""){
+      return false;
+    }else if(_controllerPassword.text.toString() == ""){
+      return false;
+    }else{
+      return true;
+    }
   }
   validateText(){
     if(!isValidUsername){
